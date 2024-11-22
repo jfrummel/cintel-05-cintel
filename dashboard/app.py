@@ -68,3 +68,9 @@ def display_time():
     """Get the latest reading and return a timestamp string"""
     latest_dictionary_entry = reactive_calc_combined()
     return f"{latest_dictionary_entry['timestamp']}"
+
+with ui.card():  
+    ui.card_header("Currrent Data")
+
+with ui.card():  
+    ui.card_header("Current Chart")
