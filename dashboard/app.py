@@ -15,10 +15,10 @@ import pandas as pd
 # Constants are usually defined in uppercase letters
 # Use a type hint to make it clear that it's an integer (: int)
 # --------------------------------------------
-UPDATE_INTERVAL_SECS: int = 1
+UPDATE_INTERVAL_SECS: int = 2
 # --------------------------------------------
 
-DEQUE_SIZE: int = 5
+DEQUE_SIZE: int = 6
 reactive_value_wrapper = reactive.value(deque(maxlen=DEQUE_SIZE))
 
 
@@ -33,7 +33,7 @@ def reactive_calc_combined():
     reactive.invalidate_later(UPDATE_INTERVAL_SECS)
 
     # Data generation logic
-    temp = round(random.uniform(-18, -16), 1)
+    temp = round(random.uniform(-20, -10), 1)
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     new_dictionary_entry = {"temp":temp, "timestamp":timestamp}
 
@@ -72,9 +72,13 @@ with ui.sidebar(open="open"):
 
 with ui.layout_columns():
     with ui.value_box(
-        showcase=icon_svg("sun"),
-        theme="bg-gradient-blue-purple",
+        showcase=icon_svg("snowflake"),
+        theme=ui.value_box_theme(
+                fg="white",
+                bg="purple"),
     ):
+    
+    
 
         "Current Temperature"
 
