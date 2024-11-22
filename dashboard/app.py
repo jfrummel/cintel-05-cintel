@@ -46,3 +46,25 @@ with ui.sidebar(open="open"):
         "A demonstration of real-time temperature readings in Antarctica.",
         class_="text-center",
     )
+
+ui.h2("Current Temperature")
+
+@render.text
+def display_temp():
+    """Get the latest reading and return a temperature string"""
+    latest_dictionary_entry = reactive_calc_combined()
+    return f"{latest_dictionary_entry['temp']} C"
+
+ui.p("warmer than usual")
+
+icon_svg("sun")
+
+ui.hr()
+
+ui.h2("Current Date and Time")
+
+@render.text
+def display_time():
+    """Get the latest reading and return a timestamp string"""
+    latest_dictionary_entry = reactive_calc_combined()
+    return f"{latest_dictionary_entry['timestamp']}"
