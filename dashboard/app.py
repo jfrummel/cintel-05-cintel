@@ -2,6 +2,7 @@ from shiny import reactive, render
 from shiny.express import ui
 from shinywidgets import render_widget
 from shinyswatch import theme
+import plotly.graph_objects as go
 
 # Imports from Python Standard Library to simulate live data
 import random
@@ -21,7 +22,7 @@ from scipy import stats
 UPDATE_INTERVAL_SECS: int = 1
 # --------------------------------------------
 
-DEQUE_SIZE: int = 6
+DEQUE_SIZE: int = 5
 reactive_value_wrapper = reactive.value(deque(maxlen=DEQUE_SIZE))
 
 
@@ -56,6 +57,7 @@ def reactive_calc_combined():
     # Return a tuple with everything we need
     # Every time we call this function, we'll get all these values
     return deque_snapshot, df, latest_dictionary_entry
+
 
 
 ui.page_opts(
@@ -125,50 +127,39 @@ with ui.card():
     ui.card_header("Trending Temperature Readings")
 
     @render_widget
-    def plot():
-        deque_snapshot, df, latest_dictionary_entry = reactive_calc_combined()
-        # Ensure the DataFrame is not empty before plotting
-        if not df.empty:
-            # Convert the 'timestamp' column to datetime for better plotting
-            df["Time Stamp"] = pd.to_datetime(df["Time Stamp"])
-
-            # Create scatter plot for readings
-            # pass in the df, the name of the x column, the name of the y column,
-            # and more
-
-            fig = px.scatter(
-                df,
-                x="Time Stamp",
-                y="Temperature",
-                title="Temperature Readings with Regression Line",
-                labels={"Temperature": "Temperature (°C)", "Time Stamp": "Time"},
-                color_discrete_sequence=["blue"],
-            )
-
-            # Linear regression - we need to get a list of the
-            # Independent variable x values (time) and the
-            # Dependent variable y values (temp)
-            # then, it's pretty easy using scipy.stats.linregress()
-
-            # For x let's generate a sequence of integers from 0 to len(df)
-            sequence = range(len(df))
-            x_vals = list(sequence)
-            y_vals = df["Temperature"]
-
-            slope, intercept, r_value, p_value, std_err = stats.linregress(
-                x_vals, y_vals
-            )
-            df["best_fit_line"] = [slope * x + intercept for x in x_vals]
-
-            # Add the regression line to the figure
-            fig.add_scatter(
-                x=df["Time Stamp"],
-                y=df["best_fit_line"],
-                mode="lines",
-                name="Regression Line",
-            )
-
-            # Update layout as needed to customize further
-            fig.update_layout(xaxis_title="Time", yaxis_title="Temperature (°C)")
-
-        return fig
+    def create_plot():
+        deque_snapshot, df, latest_dictionary_entry=reactive_calc_combined()
+        fig = go.Figure(layout=go.Layout(
+        title="Simple Scatter Plot",
+        yaxis_range=[-20, -10],
+        yaxis_title="Y-axis"
+    ))
+    
+        # Add scatter plot
+        fig.add_trace(go.Scatter(x=df['Time Stamp'], y=df['Temperature'], name='Data Points'))
+    
+        # Add regression line
+        sequence = range(len(df))
+        x_vals = list(sequence)
+        y_vals = df["Temperature"]
+        
+        slope, intercept, r_value, p_value, std_err = stats.linregress(
+            x_vals, y_vals
+        )
+        df["best_fit_line"] = [slope * x + intercept for x in x_vals]
+        
+        # Add the regression line to the figure
+        fig.add_scatter(
+            x=df["Time Stamp"],
+            y=df["best_fit_line"],
+            mode="lines",
+            name="Regression Line",
+        )
+        
+        
+        
+        # Update layout as needed to customize further
+        fig.update_layout(xaxis_title="Time", yaxis_title="Temperature (°C)")
+            
+            
+        
