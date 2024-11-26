@@ -161,5 +161,4 @@ with ui.card():
         # Update layout as needed to customize further
         fig.update_layout(xaxis_title="Time", yaxis_title="Temperature (°C)")
             
-            
-        
+        return fig
